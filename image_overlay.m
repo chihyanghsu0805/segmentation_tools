@@ -2,7 +2,7 @@ function image_overlay(image, seg, gt, display_options, output_filename)
 % image should be in Row X Column X Slice X Sequence
 % seg should be in Row X Column X Slice
 % gt  should be in Row X Column X Slice
-% display_options include num_slices and color
+% display_options include intensity_range, num_slices alpha, and color
 % output_filename
 
 close all
@@ -21,14 +21,15 @@ else
 end
 
 if isempty(display_options)
+    display_options.intensity_range = [min(image(:)) max(image(:))];
     display_options.num_slices = 10;
     if bool_gt
-        num_labels = unique(gt)-1;
+        num_labels = length(unique(gt))-1;
     else
-        num_labels = unique(seg)-1;
+        num_labels = length(unique(seg))-1;
     end
     display_options.color = jet(num_labels);
-    display_options.alpha = 0.5
+    display_options.alpha = 0.5;
 end
 
 %% Find Slices with Signal
@@ -79,7 +80,7 @@ image_stack = repmat(image_stack, repeat, 1);
 mask_stack = uint8(mask_stack);
 %% Display
 RGBMask = ind2rgb(mask_stack, display_options.color);
-imshow(image_stack, image_options.intensity_range)
+imshow(image_stack, display_options.intensity_range)
 hold on
 h = imshow(RGBMask);
 hold off
